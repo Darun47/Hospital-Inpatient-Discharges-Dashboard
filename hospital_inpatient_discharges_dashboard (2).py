@@ -153,24 +153,46 @@ def download_button(df, filename="cleaned_discharge_data.csv"):
     st.markdown(href, unsafe_allow_html=True)
 
 st.sidebar.title("Hospital Inpatient Discharges")
-uploaded_file = st.sidebar.file_uploader("Upload inpatient discharges CSV or Excel", type=["csv","xlsx","xls"])
-dataset_path = "/content/drive/MyDrive/Dataset Scenario 2:Hospital Inpatient Discharges Dashboard/Hospital_Inpatient_Discharges__SPARCS_De-Identified___2021_20231012.csv"
+import zipfile
+import io
 
-use_sample = st.sidebar.checkbox("Use sample dataset", value=(uploaded_file is None))
+st.sidebar.title("Hospital Inpatient Discharges")
 
-if uploaded_file is None and not use_sample:
-    raw_df = pd.read_csv(dataset_path)
+uploaded_file = st.sidebar.file_uploader(
+    "Upload dataset (ZIP with CSV, CSV, or Excel)",
+    type=["zip", "csv", "xlsx", "xls"]
+)
+
+use_sample = st.sidebar.checkbox("Use sample dataset", value=False)
+
+raw_df = None
+
+if uploaded_file is not None and not use_sample:
+    file_name = uploaded_file.name.lower()
+    try:
+        if file_name.endswith(".zip"):
+            with zipfile.ZipFile(uploaded_file, "r") as z:
+                csv_files = [f for f in z.namelist() if f.lower().endswith(".csv")]
+                if len(csv_files) == 0:
+                    st.error("No CSV file found inside ZIP.")
+                    st.stop()
+                with z.open(csv_files[0]) as csv_file:
+                    raw_df = pd.read_csv(csv_file, low_memory=False)
+        elif file_name.endswith(".csv"):
+            raw_df = pd.read_csv(uploaded_file, low_memory=False)
+        elif file_name.endswith((".xlsx", ".xls")):
+            raw_df = pd.read_excel(uploaded_file)
+        else:
+            st.error("Unsupported file type.")
+            st.stop()
+    except Exception as e:
+        st.error(f"Error loading file: {e}")
+        st.stop()
 else:
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.lower().endswith((".xls", ".xlsx")):
-                raw_df = pd.read_excel(uploaded_file)
-            else:
-                raw_df = pd.read_csv(uploaded_file)
-        except Exception:
-            raw_df = pd.read_csv(io.StringIO(uploaded_file.getvalue().decode("utf-8")), error_bad_lines=False)
-    else:
-        raw_df = generate_sample_data()
+    raw_df = generate_sample_data()
+
+df = clean_data(raw_df)
+filtered = filter_dataframe(df)
 
 df = clean_data(raw_df)
 filtered = filter_dataframe(df)
