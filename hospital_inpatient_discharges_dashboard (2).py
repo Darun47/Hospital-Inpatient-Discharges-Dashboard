@@ -6,30 +6,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 from datetime import datetime
-import zipfile
-import io
+
 
 st.set_page_config(layout="wide", page_title="Hospital Inpatient Discharges Dashboard", page_icon="🏥")
-
-st.sidebar.title("Hospital Inpatient Discharges")
-
-uploaded_file = st.sidebar.file_uploader("Upload cleaned ZIP dataset", type=["zip"])
-
-use_sample = st.sidebar.checkbox("Use sample dataset", value=(uploaded_file is None))
-
-if uploaded_file is not None and not use_sample:
-    try:
-        with zipfile.ZipFile(uploaded_file, 'r') as z:
-            csv_name = [f for f in z.namelist() if f.endswith(".csv")][0]
-            with z.open(csv_name) as csv_file:
-                raw_df = pd.read_csv(csv_file, low_memory=False)
-    except Exception as e:
-        st.error(f"Error reading ZIP file: {e}")
-        st.stop()
-else:
-    raw_df = generate_sample_data()
-
-
 @st.cache_data
 def generate_sample_data(n=2000, seed=42):
     np.random.seed(seed)
