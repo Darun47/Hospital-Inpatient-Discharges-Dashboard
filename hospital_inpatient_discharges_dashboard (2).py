@@ -229,6 +229,4 @@ insights_csv = leader.to_csv(index=False)
 b64 = base64.b64encode(insights_csv.encode()).decode()
 st.markdown(f'<a href="data:file/csv;base64,{b64}" download="diagnosis_leaderboard.csv">Download Diagnosis Leaderboard CSV</a>', unsafe_allow_html=True)
 
-st.markdown("### Notes & Deployment")
-st.markdown("- Upload your real dataset in CSV/Excel format or use the sample data to explore the dashboard.")
-st.markdown("- To deploy: push this file to a GitHub repository with a requirements.txt listing streamlit, pandas, numpy, plotly and deploy on Streamlit Cloud.")
+
