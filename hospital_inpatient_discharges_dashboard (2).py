@@ -178,6 +178,24 @@ filtered = filter_dataframe(df)
 kpis = compute_kpis(filtered)
 
 st.title("Hospital Inpatient Discharges Dashboard")
+import zipfile
+import io
+
+uploaded_file = st.sidebar.file_uploader("Upload cleaned ZIP dataset", type=["zip"])
+use_sample = st.sidebar.checkbox("Use sample dataset", value=(uploaded_file is None))
+
+if uploaded_file is not None and not use_sample:
+    try:
+        with zipfile.ZipFile(uploaded_file, 'r') as z:
+            csv_name = [f for f in z.namelist() if f.endswith(".csv")][0]
+            with z.open(csv_name) as csv_file:
+                raw_df = pd.read_csv(csv_file, low_memory=False)
+    except Exception as e:
+        st.error(f"Error loading ZIP: {e}")
+        st.stop()
+else:
+    raw_df = generate_sample_data()
+
 col1, col2, col3, col4 = st.columns([2,2,2,2])
 col1.metric("Total Discharges", kpis["total_discharges"])
 col2.metric("Avg Length of Stay (days)", f'{kpis["avg_los"]:.2f}')
