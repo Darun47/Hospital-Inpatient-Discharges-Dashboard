@@ -184,7 +184,7 @@ def download_button(df, filename="cleaned_discharge_data.csv"):
 st.sidebar.title("Hospital Inpatient Discharges")
 
 data_source = st.sidebar.radio("Data source", ["Google Drive Parquet", "Sample dataset"], index=0)
-parquet_path = st.sidebar.text_input("Parquet file path", "/content/drive/MyDrive/cleaned dataset /cleaned_dataset.parquet")
+parquet_path = st.sidebar.text_input("Parquet file path", "/content/drive/MyDrive/cleaned_dataset /cleaned_dataset.parquet")
 preview_rows = st.sidebar.slider("Rows to preview", min_value=50, max_value=1000, value=200, step=50)
 
 if data_source == "Google Drive Parquet":
