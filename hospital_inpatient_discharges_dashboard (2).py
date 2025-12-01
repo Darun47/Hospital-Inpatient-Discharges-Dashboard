@@ -5,8 +5,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
-import zipfile
 from datetime import datetime
+import zipfile
 
 st.set_page_config(layout="wide", page_title="Hospital Inpatient Discharges Dashboard", page_icon="🏥")
 
@@ -62,17 +62,17 @@ def filter_dataframe(df):
     st.sidebar.header("Filters")
     min_date = df["admission_date"].min()
     max_date = df["admission_date"].max()
-    date_range = st.sidebar.date_input("Admission date range", [min_date.date(), max_date.date()], key="admission_range")
+    date_range = st.sidebar.date_input("Admission Date Range", [min_date.date(), max_date.date()], key="date_filter")
     df2 = df[(df["admission_date"]>=pd.to_datetime(date_range[0])) & (df["admission_date"]<=pd.to_datetime(date_range[1]))]
     facilities = st.sidebar.multiselect("Facility", sorted(df["facility"].unique()), default=list(sorted(df["facility"].unique())))
     counties = st.sidebar.multiselect("County", sorted(df["county"].unique()), default=list(sorted(df["county"].unique())))
     severities = st.sidebar.multiselect("Severity", sorted(df["severity"].unique()), default=list(sorted(df["severity"].unique())))
-    payment = st.sidebar.multiselect("Payment Type", sorted(df["payment_type"].unique()), default=list(sorted(df["payment_type"].unique())))
-    diagnoses = st.sidebar.multiselect("Diagnosis Codes", sorted(df["diagnosis_code"].unique()), default=list(sorted(df["diagnosis_code"].unique()))[:10])
+    payments = st.sidebar.multiselect("Payment Type", sorted(df["payment_type"].unique()), default=list(sorted(df["payment_type"].unique())))
+    diagnoses = st.sidebar.multiselect("Diagnosis", sorted(df["diagnosis_code"].unique()), default=list(sorted(df["diagnosis_code"].unique()))[:10])
     if facilities: df2 = df2[df2["facility"].isin(facilities)]
     if counties: df2 = df2[df2["county"].isin(counties)]
     if severities: df2 = df2[df2["severity"].isin(severities)]
-    if payment: df2 = df2[df2["payment_type"].isin(payment)]
+    if payments: df2 = df2[df2["payment_type"].isin(payments)]
     if diagnoses: df2 = df2[df2["diagnosis_code"].isin(diagnoses)]
     return df2
 
@@ -81,19 +81,59 @@ def compute_kpis(df):
         "total": df.shape[0],
         "avg_los": df["length_of_stay"].mean(),
         "median_los": df["length_of_stay"].median(),
-        "readmit_rate": df["is_readmit"].mean() * 100
+        "readmit": df["is_readmit"].mean()*100
     }
 
-st.sidebar.title("Hospital Inpatient Discharges Dataset")
-uploaded_file = st.sidebar.file_uploader("Upload dataset (ZIP / CSV / Excel)", type=["zip","csv","xlsx","xls"])
+def plot_avg_stay(df):
+    agg = df.groupby("diagnosis_code")["length_of_stay"].mean().reset_index().sort_values("length_of_stay", ascending=False).head(20)
+    return px.bar(agg, x="diagnosis_code", y="length_of_stay", title="Avg Length of Stay by Diagnosis Code")
+
+def plot_charges(df):
+    return px.box(df, x="severity", y="total_charges", title="Charges by Severity")
+
+def plot_heat(df):
+    pivot = df.pivot_table(index="facility", columns="county", values="length_of_stay", aggfunc="mean").fillna(0)
+    return px.imshow(pivot, title="AVG LOS Heatmap (Facility vs County)")
+
+def plot_payment(df):
+    dist = df["payment_type"].value_counts().reset_index()
+    dist.columns=["payment_type","count"]
+    return px.pie(dist, names="payment_type", values="count", hole=0.3, title="Payment Type Distribution")
+
+def plot_los_hist(df):
+    return px.histogram(df, x="length_of_stay", nbins=30, title="Distribution of LOS")
+
+def plot_age_los(df):
+    s = df.sample(min(3000, len(df)))
+    x, y = s["age"], s["length_of_stay"]
+    m, b = np.polyfit(x, y, 1)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x, y=y, mode="markers"))
+    fig.add_trace(go.Scatter(x=np.sort(x), y=m*np.sort(x)+b, mode="lines"))
+    fig.update_layout(title="Age vs Length of Stay")
+    return fig
+
+def diagnosis_leaderboard(df):
+    agg = df.groupby("diagnosis_code").agg(avg_los=("length_of_stay","mean"), avg_cost=("total_charges","mean"), count=("patient_id","count")).reset_index()
+    return agg.sort_values("avg_los", ascending=False).head(15)
+
+def zip_export(df):
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr("cleaned_data.csv", df.to_csv(index=False))
+    st.download_button("Download Cleaned Data ZIP", data=buffer.getvalue(), file_name="cleaned_dataset.zip", mime="application/zip")
+
+st.sidebar.title("Hospital Inpatient Discharges")
+
+uploaded_file = st.sidebar.file_uploader("Upload (ZIP / CSV / Excel)", type=["zip","csv","xlsx","xls"])
 use_sample = st.sidebar.checkbox("Use sample dataset", value=False)
 
 if uploaded_file and not use_sample:
     name = uploaded_file.name.lower()
     if name.endswith(".zip"):
         with zipfile.ZipFile(uploaded_file, "r") as z:
-            csv_file = [f for f in z.namelist() if f.lower().endswith(".csv")][0]
-            with z.open(csv_file) as f:
+            csvfile = [f for f in z.namelist() if f.lower().endswith(".csv")][0]
+            with z.open(csvfile) as f:
                 raw_df = pd.read_csv(f)
     elif name.endswith(".csv"):
         raw_df = pd.read_csv(uploaded_file)
@@ -107,8 +147,28 @@ filtered = filter_dataframe(df)
 kpis = compute_kpis(filtered)
 
 st.title("Hospital Inpatient Discharges Dashboard")
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Total Discharges", kpis["total"])
-col2.metric("Avg LOS", f"{kpis['avg_los']:.2f}")
-col3.metric("Median LOS", f"{kpis['median_los']:.0f}")
-col4.metric("Readmission Rate (%)", f"{kpis['readmit_rate']:.2f}")
+
+c1,c2,c3,c4 = st.columns(4)
+c1.metric("Total Discharges", kpis["total"])
+c2.metric("Avg LOS", f"{kpis['avg_los']:.2f}")
+c3.metric("Median LOS", f"{kpis['median_los']:.0f}")
+c4.metric("Readmission Rate %", f"{kpis['readmit']:.2f}")
+
+with st.expander("View Data & Download"):
+    st.dataframe(filtered.head(200))
+    zip_export(filtered)
+
+left,right = st.columns(2)
+with left:
+    st.plotly_chart(plot_avg_stay(filtered), use_container_width=True)
+    st.plotly_chart(plot_charges(filtered), use_container_width=True)
+with right:
+    st.plotly_chart(plot_heat(filtered), use_container_width=True)
+    st.plotly_chart(plot_payment(filtered), use_container_width=True)
+
+a,b = st.columns(2)
+with a: st.plotly_chart(plot_los_hist(filtered), use_container_width=True)
+with b: st.plotly_chart(plot_age_los(filtered), use_container_width=True)
+
+st.subheader("Diagnosis Leaderboard")
+st.dataframe(diagnosis_leaderboard(filtered))
