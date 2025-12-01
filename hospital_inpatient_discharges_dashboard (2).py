@@ -1,5 +1,3 @@
-!pip install streamlit --quiet
-
 import io
 import base64
 import numpy as np
