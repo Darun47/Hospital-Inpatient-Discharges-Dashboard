@@ -154,7 +154,18 @@ def download_button(df, filename="cleaned_discharge_data.csv"):
 
 st.sidebar.title("Hospital Inpatient Discharges")
 uploaded_file = st.sidebar.file_uploader("Upload inpatient discharges CSV or Excel", type=["csv","xlsx","xls"])
-dataset_path = "/content/drive/MyDrive/Dataset Scenario 2:Hospital Inpatient Discharges Dashboard/Hospital_Inpatient_Discharges__SPARCS_De-Identified___2021_20231012.csv"
+google_drive_id = st.sidebar.text_input("https://drive.google.com/file/d/17XAIEEOIHOL0j28a5YCNuSjl67IGDHXL/view?usp=drive_link")
+
+raw_df = None
+
+if google_drive_id:
+    try:
+        gdrive_url = https://drive.google.com/file/d/17XAIEEOIHOL0j28a5YCNuSjl67IGDHXL/view?usp=drive_link"
+        st.sidebar.write("Loading Google Drive dataset...")
+        raw_df = pd.read_csv(gdrive_url)
+        st.sidebar.success("Google Drive dataset loaded!")
+    except Exception as e:
+        st.sidebar.error(f"Failed to load Google Drive file: {e}")
 
 use_sample = st.sidebar.checkbox("Use sample dataset", value=(uploaded_file is None))
 
