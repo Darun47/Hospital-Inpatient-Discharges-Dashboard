@@ -128,8 +128,16 @@ def plot_los_histogram(df):
     return fig
 
 def plot_age_vs_los_scatter(df):
-    fig = px.scatter(df.sample(min(5000, max(1, df.shape[0]))), x="age", y="length_of_stay", trendline="ols", labels={"age":"Age","length_of_stay":"Length of Stay"}, title="Age vs Length of Stay")
+    d = df.sample(min(5000, max(1, df.shape[0])))
+    x = d["age"].values
+    y = d["length_of_stay"].values
+    m, b = np.polyfit(x, y, 1)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x, y=y, mode="markers", name="Data"))
+    fig.add_trace(go.Scatter(x=np.sort(x), y=m*np.sort(x)+b, mode="lines", name="Trendline"))
+    fig.update_layout(title="Age vs Length of Stay", xaxis_title="Age", yaxis_title="Length of Stay")
     return fig
+
 
 def diagnosis_leaderboard(df):
     agg = df.groupby("diagnosis_code").agg(avg_los=("length_of_stay","mean"), avg_charges=("total_charges","mean"), count=("patient_id","count")).reset_index().sort_values("avg_los", ascending=False)
@@ -146,17 +154,23 @@ def download_button(df, filename="cleaned_discharge_data.csv"):
 
 st.sidebar.title("Hospital Inpatient Discharges")
 uploaded_file = st.sidebar.file_uploader("Upload inpatient discharges CSV or Excel", type=["csv","xlsx","xls"])
+dataset_path = "/content/drive/MyDrive/Dataset Scenario 2:Hospital Inpatient Discharges Dashboard/Hospital_Inpatient_Discharges__SPARCS_De-Identified___2021_20231012.csv"
+
 use_sample = st.sidebar.checkbox("Use sample dataset", value=(uploaded_file is None))
-if uploaded_file is not None and not use_sample:
-    try:
-        if uploaded_file.name.lower().endswith((".xls", ".xlsx")):
-            raw_df = pd.read_excel(uploaded_file)
-        else:
-            raw_df = pd.read_csv(uploaded_file)
-    except Exception:
-        raw_df = pd.read_csv(io.StringIO(uploaded_file.getvalue().decode("utf-8")), error_bad_lines=False)
+
+if uploaded_file is None and not use_sample:
+    raw_df = pd.read_csv(dataset_path)
 else:
-    raw_df = generate_sample_data()
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.lower().endswith((".xls", ".xlsx")):
+                raw_df = pd.read_excel(uploaded_file)
+            else:
+                raw_df = pd.read_csv(uploaded_file)
+        except Exception:
+            raw_df = pd.read_csv(io.StringIO(uploaded_file.getvalue().decode("utf-8")), error_bad_lines=False)
+    else:
+        raw_df = generate_sample_data()
 
 df = clean_data(raw_df)
 filtered = filter_dataframe(df)
