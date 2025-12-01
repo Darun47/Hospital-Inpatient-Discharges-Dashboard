@@ -1,4 +1,3 @@
-
 import io
 import base64
 import numpy as np
@@ -139,6 +138,7 @@ def plot_age_vs_los_scatter(df):
     fig.update_layout(title="Age vs Length of Stay", xaxis_title="Age", yaxis_title="Length of Stay")
     return fig
 
+
 def diagnosis_leaderboard(df):
     agg = df.groupby("diagnosis_code").agg(avg_los=("length_of_stay","mean"), avg_charges=("total_charges","mean"), count=("patient_id","count")).reset_index().sort_values("avg_los", ascending=False)
     agg["avg_los"] = agg["avg_los"].round(2)
@@ -154,36 +154,23 @@ def download_button(df, filename="cleaned_discharge_data.csv"):
 
 st.sidebar.title("Hospital Inpatient Discharges")
 uploaded_file = st.sidebar.file_uploader("Upload inpatient discharges CSV or Excel", type=["csv","xlsx","xls"])
-google_drive_id = st.sidebar.text_input("https://drive.google.com/file/d/17XAIEEOIHOL0j28a5YCNuSjl67IGDHXL/view?usp=drive_link")
+dataset_path = "/content/drive/MyDrive/Dataset Scenario 2:Hospital Inpatient Discharges Dashboard/Hospital_Inpatient_Discharges__SPARCS_De-Identified___2021_20231012.csv"
 
-raw_df = None
+use_sample = st.sidebar.checkbox("Use sample dataset", value=(uploaded_file is None))
 
-if google_drive_id:
-    try:
-        gdrive_url = f"https://drive.google.com/file/d/17XAIEEOIHOL0j28a5YCNuSjl67IGDHXL/view?usp=drive_link"
-        st.sidebar.write("Loading Google Drive dataset...")
-        raw_df = pd.read_csv(gdrive_url)
-        st.sidebar.success("Dataset loaded from Google Drive!")
-    except Exception as e:
-        st.sidebar.error(f"Failed to load Google Drive file: {e}")
-
-if raw_df is None:  # Only run if not loaded from Google Drive
-
-    if uploaded_file is None and not use_sample:
-        raw_df = pd.read_csv(dataset_path)
-
+if uploaded_file is None and not use_sample:
+    raw_df = pd.read_csv(dataset_path)
+else:
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.lower().endswith((".xls", ".xlsx")):
+                raw_df = pd.read_excel(uploaded_file)
+            else:
+                raw_df = pd.read_csv(uploaded_file)
+        except Exception:
+            raw_df = pd.read_csv(io.StringIO(uploaded_file.getvalue().decode("utf-8")), error_bad_lines=False)
     else:
-        if uploaded_file is not None and not use_sample:
-            try:
-                if uploaded_file.name.lower().endswith((".xls", ".xlsx")):
-                    raw_df = pd.read_excel(uploaded_file)
-                else:
-                    raw_df = pd.read_csv(uploaded_file)
-            except Exception:
-                raw_df = pd.read_csv(io.StringIO(uploaded_file.getvalue().decode("utf-8")), on_bad_lines="skip")
-        else:
-            raw_df = generate_sample_data()
-
+        raw_df = generate_sample_data()
 
 df = clean_data(raw_df)
 filtered = filter_dataframe(df)
@@ -242,4 +229,6 @@ insights_csv = leader.to_csv(index=False)
 b64 = base64.b64encode(insights_csv.encode()).decode()
 st.markdown(f'<a href="data:file/csv;base64,{b64}" download="diagnosis_leaderboard.csv">Download Diagnosis Leaderboard CSV</a>', unsafe_allow_html=True)
 
-
+st.markdown("### Notes & Deployment")
+st.markdown("- Upload your real dataset in CSV/Excel format or use the sample data to explore the dashboard.")
+st.markdown("- To deploy: push this file to a GitHub repository with a requirements.txt listing streamlit, pandas, numpy, plotly and deploy on Streamlit Cloud.")
