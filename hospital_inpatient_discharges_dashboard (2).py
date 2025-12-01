@@ -160,28 +160,30 @@ raw_df = None
 
 if google_drive_id:
     try:
-        gdrive_url = "https://drive.google.com/file/d/17XAIEEOIHOL0j28a5YCNuSjl67IGDHXL/view?usp=drive_link"
+        gdrive_url = f"https://drive.google.com/file/d/17XAIEEOIHOL0j28a5YCNuSjl67IGDHXL/view?usp=drive_link"
         st.sidebar.write("Loading Google Drive dataset...")
         raw_df = pd.read_csv(gdrive_url)
-        st.sidebar.success("Google Drive dataset loaded!")
+        st.sidebar.success("Dataset loaded from Google Drive!")
     except Exception as e:
         st.sidebar.error(f"Failed to load Google Drive file: {e}")
 
-use_sample = st.sidebar.checkbox("Use sample dataset", value=(uploaded_file is None))
+if raw_df is None:  # Only run if not loaded from Google Drive
 
-if uploaded_file is None and not use_sample:
-    raw_df = pd.read_csv(dataset_path)
-else:
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.lower().endswith((".xls", ".xlsx")):
-                raw_df = pd.read_excel(uploaded_file)
-            else:
-                raw_df = pd.read_csv(uploaded_file)
-        except Exception:
-            raw_df = pd.read_csv(io.StringIO(uploaded_file.getvalue().decode("utf-8")), error_bad_lines=False)
+    if uploaded_file is None and not use_sample:
+        raw_df = pd.read_csv(dataset_path)
+
     else:
-        raw_df = generate_sample_data()
+        if uploaded_file is not None and not use_sample:
+            try:
+                if uploaded_file.name.lower().endswith((".xls", ".xlsx")):
+                    raw_df = pd.read_excel(uploaded_file)
+                else:
+                    raw_df = pd.read_csv(uploaded_file)
+            except Exception:
+                raw_df = pd.read_csv(io.StringIO(uploaded_file.getvalue().decode("utf-8")), on_bad_lines="skip")
+        else:
+            raw_df = generate_sample_data()
+
 
 df = clean_data(raw_df)
 filtered = filter_dataframe(df)
