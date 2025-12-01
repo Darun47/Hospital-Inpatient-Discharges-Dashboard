@@ -160,7 +160,7 @@ raw_df = None
 
 if google_drive_id:
     try:
-        gdrive_url = https://drive.google.com/file/d/17XAIEEOIHOL0j28a5YCNuSjl67IGDHXL/view?usp=drive_link"
+        gdrive_url = "https://drive.google.com/file/d/17XAIEEOIHOL0j28a5YCNuSjl67IGDHXL/view?usp=drive_link"
         st.sidebar.write("Loading Google Drive dataset...")
         raw_df = pd.read_csv(gdrive_url)
         st.sidebar.success("Google Drive dataset loaded!")
