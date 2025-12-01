@@ -137,7 +137,14 @@ def plot_los_histogram(df):
     return fig
 
 def plot_age_vs_los_scatter(df):
-    fig = px.scatter(df.sample(min(5000, max(1, df.shape[0]))), x="age", y="length_of_stay", trendline="ols", labels={"age":"Age","length_of_stay":"Length of Stay"}, title="Age vs Length of Stay")
+    d = df.sample(min(5000, max(1, df.shape[0])))
+    x = d["age"].values
+    y = d["length_of_stay"].values
+    m, b = np.polyfit(x, y, 1)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x, y=y, mode="markers", name="Data"))
+    fig.add_trace(go.Scatter(x=np.sort(x), y=m*np.sort(x)+b, mode="lines", name="Trendline"))
+    fig.update_layout(title="Age vs Length of Stay", xaxis_title="Age", yaxis_title="Length of Stay")
     return fig
 
 def diagnosis_leaderboard(df):
