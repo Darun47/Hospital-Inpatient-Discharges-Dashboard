@@ -1,3 +1,5 @@
+!pip install streamlit --quiet
+
 import io
 import base64
 import numpy as np
@@ -6,7 +8,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 from datetime import datetime
-
 
 st.set_page_config(layout="wide", page_title="Hospital Inpatient Discharges Dashboard", page_icon="🏥")
 @st.cache_data
@@ -259,7 +260,11 @@ colA, colB = st.columns(2)
 with colA:
     readmit_by_diag = filtered.groupby("diagnosis_code").agg(readmit_rate=("is_readmit","mean"), count=("patient_id","count")).reset_index()
     readmit_by_diag["readmit_rate"] = (readmit_by_diag["readmit_rate"]*100).round(2)
-    st.bar_chart(readmit_by_diag.sort_values("readmit_rate", ascending=False).head(15).set_index("diagnosis_code")["readmit_rate"])
+    st.bar_chart(
+        readmit_by_diag.sort_values("readmit_rate", ascending=False)
+        .head(15)
+        .set_index("diagnosis_code")["readmit_rate"]
+    )
 with colB:
     top_facilities = filtered.groupby("facility").agg(avg_los=("length_of_stay","mean"), avg_charges=("total_charges","mean"), discharges=("patient_id","count")).reset_index().sort_values("discharges", ascending=False)
     st.table(top_facilities.head(10).assign(avg_los=lambda x: x["avg_los"].round(2), avg_charges=lambda x: x["avg_charges"].round(2)))
