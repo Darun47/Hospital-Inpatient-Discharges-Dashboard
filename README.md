@@ -56,7 +56,7 @@ https://hospital-inpatient-discharges-dashboard-j9aynbolgmblhrvakaphtf.streamlit
 
 ### Screenshots
 
-<img width="1890" height="686" alt="Screenshot 2025-12-02 130634" src="https://github.com/user-attachments/assets/1e19a408-ba80-42b5-bb45-45969e77a9f4" />
+<img width="1832" height="774" alt="Screenshot 2025-12-02 130952" src="https://github.com/user-attachments/assets/505b3f41-723c-4e90-9d79-aa16237b7356" />
 <img width="1919" height="681" alt="Screenshot 2025-12-02 130730" src="https://github.com/user-attachments/assets/65c86cb9-c739-4192-aa0c-5cd9db97c9ad" />
 <img width="1914" height="665" alt="Screenshot 2025-12-02 130740" src="https://github.com/user-attachments/assets/da31dd60-a924-449a-85e6-bc3b260135af" />
 <img width="1837" height="612" alt="Screenshot 2025-12-02 130750" src="https://github.com/user-attachments/assets/194b23f7-a66d-4efd-bc21-d6dcf681ba4e" />
