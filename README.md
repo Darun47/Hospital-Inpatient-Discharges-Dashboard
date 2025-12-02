@@ -56,13 +56,10 @@ https://hospital-inpatient-discharges-dashboard-j9aynbolgmblhrvakaphtf.streamlit
 
 ### Screenshots
 
-<img width="243" height="704" alt="Screenshot 2025-12-02 093119" src="https://github.com/user-attachments/assets/786bfbd6-8fd0-48b4-9d15-7fba0af14ed5" />
-<img width="736" height="450" alt="newplot" src="https://github.com/user-attachments/assets/f7eb9fd5-7d79-445a-800e-009874889a53" />
-<img width="736" height="450" alt="newplot (1)" src="https://github.com/user-attachments/assets/1a1976a1-f760-424e-a6fb-ab7af01f0135" />
-<img width="736" height="450" alt="newplot (2)" src="https://github.com/user-attachments/assets/5f04e207-08b6-414e-970c-a2aa34310d2f" />
-<img width="736" height="450" alt="newplot (3)" src="https://github.com/user-attachments/assets/e541f723-3a54-46ea-9aa1-a28ac300501c" />
-<img width="736" height="450" alt="newplot (4)" src="https://github.com/user-attachments/assets/daa27c3c-bc0b-4b32-bd9a-ac8d6592139e" />
-<img width="736" height="450" alt="newplot (5)" src="https://github.com/user-attachments/assets/cafbedc5-66af-49ab-aee4-57ffb07d7881" />
+<img width="1890" height="686" alt="Screenshot 2025-12-02 130634" src="https://github.com/user-attachments/assets/1e19a408-ba80-42b5-bb45-45969e77a9f4" />
+<img width="1919" height="681" alt="Screenshot 2025-12-02 130730" src="https://github.com/user-attachments/assets/65c86cb9-c739-4192-aa0c-5cd9db97c9ad" />
+<img width="1914" height="665" alt="Screenshot 2025-12-02 130740" src="https://github.com/user-attachments/assets/da31dd60-a924-449a-85e6-bc3b260135af" />
+<img width="1837" height="612" alt="Screenshot 2025-12-02 130750" src="https://github.com/user-attachments/assets/194b23f7-a66d-4efd-bc21-d6dcf681ba4e" />
 
 
 
