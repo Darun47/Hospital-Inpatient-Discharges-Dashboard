@@ -1,5 +1,5 @@
-Hospital Inpatient Discharge Dashboard
-Streamlit Data Analytics Project | Healthcare Performance Insights
+# Hospital Inpatient Discharge Dashboard
+## Streamlit Data Analytics Project | Healthcare Performance Insights
 📌 Project Overview
 
 This project presents an interactive dashboard built using Python, Streamlit, Pandas, and Plotly to analyze hospital inpatient discharge data.
