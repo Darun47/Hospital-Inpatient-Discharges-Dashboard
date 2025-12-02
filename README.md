@@ -26,4 +26,31 @@ Technologies
 
 Python • Pandas • NumPy • Plotly • Streamlit • GitHub
 
+### Technologies
+
+Tool	              Purpose
+Python         | Data processing
+Pandas / NumPy | Data cleaning & analysis
+Plotly Express | Interactive visual charts
+Streamlit      | Dashboard development
+GitHub         | Version control & deployment
+
+### Repository Structure
+
+├── app.py
+├── requirements.txt
+├── README.md
+├── /images   
+
 ### Live App
+
+https://hospital-inpatient-discharges-dashboard-j9aynbolgmblhrvakaphtf.streamlit.app/
+
+### Author
+
+Student Name: DARUN
+Student ID: 1000309
+Course: Mathematics for AI-II
+
+
+
