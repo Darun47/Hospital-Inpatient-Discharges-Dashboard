@@ -55,6 +55,8 @@ GitHub         | Version control & deployment
 https://hospital-inpatient-discharges-dashboard-j9aynbolgmblhrvakaphtf.streamlit.app/
 
 ### Screenshots
+
+<img width="243" height="704" alt="Screenshot 2025-12-02 093119" src="https://github.com/user-attachments/assets/786bfbd6-8fd0-48b4-9d15-7fba0af14ed5" />
 <img width="736" height="450" alt="newplot" src="https://github.com/user-attachments/assets/f7eb9fd5-7d79-445a-800e-009874889a53" />
 <img width="736" height="450" alt="newplot (1)" src="https://github.com/user-attachments/assets/1a1976a1-f760-424e-a6fb-ab7af01f0135" />
 <img width="736" height="450" alt="newplot (2)" src="https://github.com/user-attachments/assets/5f04e207-08b6-414e-970c-a2aa34310d2f" />
