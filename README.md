@@ -5,7 +5,7 @@
 This project presents an interactive dashboard built using Python, Streamlit, Pandas, and Plotly to analyze hospital inpatient discharge data.
 The goal is to help hospital administrators, clinicians, and operations managers understand patient discharge patterns and improve decision-making through data insights.
 
-###Features
+##Features
 
 Upload dataset (CSV / Excel)
 
